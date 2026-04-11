@@ -1,13 +1,19 @@
 # Publish wheels/sdist to PyPI when you push a version tag: git tag v0.1.1 && git push origin v0.1.1
 #
-# One-time PyPI setup (trusted publishing — no API token in GitHub secrets):
-# 1. Create the "honeyhex" project on PyPI (or your chosen name).
-# 2. PyPI → Project → Settings → Publishing → Add pending publisher:
-#    - Owner: your GitHub user or org
-#    - Repository: HoneyHex (or repo name)
-#    - Workflow: publish.yml
-#    - Environment: (leave empty) or create "release" and match below
-# 3. Ensure the tag matches pyproject.toml version before tagging.
+# Publishing options (pick one):
+#
+# A) API token (simplest to start)
+#    1. PyPI → Account settings → API tokens → Create (scope to project "honeyhex").
+#    2. GitHub repo → Settings → Secrets and variables → Actions → New repository secret:
+#       Name:  PYPI_API_TOKEN
+#       Value: pypi-AgEI...   (the token string)
+#    3. Do NOT commit the token; it only lives in GitHub Secrets.
+#
+# B) Trusted publishing (no long-lived token in GitHub)
+#    PyPI → Project → Settings → Publishing → Add pending publisher → link this repo + publish.yml.
+#    Leave PYPI_API_TOKEN unset; the workflow uses OIDC (id-token permission below).
+#
+# Before any release: bump version in pyproject.toml, then tag: git tag v0.1.1 && git push origin v0.1.1
 
 name: Publish to PyPI
 
@@ -41,5 +47,6 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        # With trusted publishing, no secrets needed. For token-based upload instead,
-        # add PYPI_API_TOKEN to repo secrets and pass: with: password: ${{ secrets.PYPI_API_TOKEN }}
+        with:
+          # If set in repo Secrets, uploads with the token. If empty, uses trusted publishing (OIDC).
+          password: ${{ secrets.PYPI_API_TOKEN }}
