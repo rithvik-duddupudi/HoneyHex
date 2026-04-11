@@ -1,0 +1,95 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "honeyhex"
+version = "0.1.0"
+description = "Distributed Ledger of Intelligence — agent thought commits and Hivemind mesh"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.10.0",
+    "typer>=0.12.0",
+    "GitPython>=3.1.40",
+    "fs>=2.4.16",
+]
+
+[project.optional-dependencies]
+redis = [
+    "redis>=5.0.0",
+]
+registry = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sqlalchemy>=2.0.36",
+    "httpx>=0.27.0",
+]
+llm = [
+    "litellm>=1.55.0",
+    "polars>=1.18.0",
+]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
+    "redis>=5.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sqlalchemy>=2.0.36",
+    "httpx>=0.27.0",
+    "litellm>=1.55.0",
+    "polars>=1.18.0",
+]
+
+[project.scripts]
+hex = "honeyhex.cli.main:app"
+honeyhex-api = "honeyhex.api.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["honeyhex"]
+
+[[tool.mypy.overrides]]
+module = [
+    "git",
+    "git.*",
+    "fs",
+    "fs.*",
+    "redis",
+    "redis.*",
+    "fastapi",
+    "fastapi.*",
+    "uvicorn",
+    "uvicorn.*",
+    "sqlalchemy",
+    "sqlalchemy.*",
+    "httpx",
+    "httpx.*",
+    "litellm",
+    "litellm.*",
+    "polars",
+    "polars.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "registry: needs honeyhex[registry] (FastAPI, SQLAlchemy, HTTP client)",
+    "llm: needs honeyhex[llm] (litellm, polars)",
+]
+addopts = "-m 'not registry and not llm'"
