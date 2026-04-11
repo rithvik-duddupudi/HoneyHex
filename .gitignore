@@ -61,3 +61,10 @@ Thumbs.db
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Legacy / local-only trees (not published with the repo)
+agent_docs/
+docs/
+
+# Local lockfile (optional; omit from repo for library-style projects)
+uv.lock
