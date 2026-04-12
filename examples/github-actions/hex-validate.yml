@@ -1,0 +1,28 @@
+# Optional: run `hex validate` in a repo that uses HoneyHex as a cell.
+# Copy into .github/workflows/ and adjust paths / Python version.
+# See README.md in this folder and ../../.github/actions/hex-validate/ for a composite action.
+name: HoneyHex validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  hex-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install HoneyHex
+        run: pip install honeyhex
+
+      - name: Validate cell
+        working-directory: ${{ github.workspace }}
+        run: hex validate

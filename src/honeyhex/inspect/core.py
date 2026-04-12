@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -36,21 +37,37 @@ def iter_log(
     cell: Path,
     *,
     max_count: int | None = None,
+    since: datetime | None = None,
+    until: datetime | None = None,
+    message_grep: str | None = None,
+    after_tag: str | None = None,
 ) -> list[LogEntry]:
-    """Return thought-commits newest first."""
+    """Return thought-commits newest first, with optional filters."""
     repo = _repo(cell)
     try:
-        commits = list(repo.iter_commits(max_count=max_count))
+        if after_tag:
+            spec = f"{after_tag}..HEAD"
+            commits = list(repo.iter_commits(spec, max_count=max_count))
+        else:
+            commits = list(repo.iter_commits(max_count=max_count))
     except GitCommandError as e:
         msg = f"log failed: {e}"
         raise ValueError(msg) from e
     entries: list[LogEntry] = []
     for c in commits:
+        msg = _commit_message(c)
+        dt = datetime.fromtimestamp(c.committed_date, tz=UTC)
+        if since is not None and dt < since:
+            continue
+        if until is not None and dt > until:
+            continue
+        if message_grep is not None and message_grep not in msg:
+            continue
         entries.append(
             LogEntry(
                 hexsha=c.hexsha,
                 short=c.hexsha[:7],
-                message=_commit_message(c),
+                message=msg,
             ),
         )
     return entries
@@ -184,8 +201,23 @@ def ensure_repo(cell: Path) -> Repo:
         raise ValueError(msg) from e
 
 
-def log_as_json(cell: Path, max_count: int | None) -> str:
-    entries = iter_log(cell, max_count=max_count)
+def log_as_json(
+    cell: Path,
+    max_count: int | None = None,
+    *,
+    since: datetime | None = None,
+    until: datetime | None = None,
+    message_grep: str | None = None,
+    after_tag: str | None = None,
+) -> str:
+    entries = iter_log(
+        cell,
+        max_count=max_count,
+        since=since,
+        until=until,
+        message_grep=message_grep,
+        after_tag=after_tag,
+    )
     payload = [
         {"hexsha": e.hexsha, "short": e.short, "message": e.message} for e in entries
     ]

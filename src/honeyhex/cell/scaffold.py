@@ -4,14 +4,20 @@ import stat
 from pathlib import Path
 
 from honeyhex.cell.config import CellConfig, config_path_json, save_cell_config
+from honeyhex.cell.onboarding import run_guided_first_run
 from honeyhex.commit.manager import CommitManager
 from honeyhex.ledger.git_store import HoneyHexLedger
 
 
-def init_cell(cell_root: Path, *, hook_stubs: bool = False) -> dict[str, str]:
+def init_cell(
+    cell_root: Path,
+    *,
+    hook_stubs: bool = False,
+    guided: bool = False,
+) -> dict[str, str]:
     """
     Ensure `.honeyhex` exists with optional `config.json` and hook script stubs.
-    Does not create an initial thought-commit.
+    Unless `guided` is set, does not create an initial thought-commit.
     """
     root = cell_root.resolve()
     mgr = CommitManager(root)
@@ -49,4 +55,8 @@ def init_cell(cell_root: Path, *, hook_stubs: bool = False) -> dict[str, str]:
         save_cell_config(root, cfg)
         created["pre-thought"] = str(pre)
         created["post-thought"] = str(post)
+    if guided:
+        hints = run_guided_first_run(root)
+        created["guided"] = "true"
+        created.update({f"hint_{k}": v for k, v in hints.items()})
     return created
