@@ -1,4 +1,5 @@
 from honeyhex.cell.config import (
+    CURRENT_SCHEMA_VERSION,
     CellConfig,
     config_path_json,
     config_path_toml,
@@ -22,6 +23,7 @@ from honeyhex.cell.remotes import (
 )
 
 __all__ = [
+    "CURRENT_SCHEMA_VERSION",
     "CellConfig",
     "config_path_json",
     "config_path_toml",

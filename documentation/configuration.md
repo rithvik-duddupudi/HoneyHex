@@ -13,6 +13,7 @@ HoneyHex reads **`config.toml`** or **`config.json`** under `.honeyhex/` (TOML p
 
 Typical keys include:
 
+- **`schema_version`** — Integer config schema (written to **`config.json`**; migrations may update this when you run commands that load config).
 - **`default_branch`** — Git branch name for the ledger.
 - **`hooks_mode`** — `off` (default), `safe`, or `full` (see [Security](security.md)).
 - **`hooks`** — map of hook names to script paths **under `.honeyhex/`** (e.g. `pre-thought` → `hooks/pre-thought.sh`).

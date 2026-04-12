@@ -29,6 +29,19 @@ pip install -e ".[dev]"
 
 A **cell** is any directory where you run `hex`. The ledger lives in **`.honeyhex/`** (a Git repository).
 
+### Fast path (~60 seconds)
+
+```bash
+mkdir ~/my-agent-cell && cd ~/my-agent-cell
+hex cell init --guided
+hex log --oneline -n 3
+hex show HEAD
+```
+
+`--guided` creates `.honeyhex/`, writes default `config.json` (with `schema_version`), and records one starter thought-commit with copy-paste next steps.
+
+### Manual path
+
 ```bash
 mkdir ~/my-agent-cell && cd ~/my-agent-cell
 hex cell init
@@ -38,6 +51,10 @@ hex commit -m "First thought" \
 hex log --oneline
 hex show HEAD
 ```
+
+### Sample cells (clone the repo)
+
+Full example layouts (game dev, research, coding agent) live under **`examples/cells/`** in the Git repository only—they are not bundled in the PyPI package. Clone HoneyHex and open that folder for walkthroughs.
 
 ## What gets stored
 

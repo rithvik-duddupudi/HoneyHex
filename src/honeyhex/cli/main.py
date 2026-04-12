@@ -16,8 +16,10 @@ from honeyhex.branching.git_ops import (
     rebase_interactive_drop,
 )
 from honeyhex.branching.shadow import run_dual_shell_commands
+from honeyhex.cli.adoption_cmds import register_adoption_commands
 from honeyhex.cli.llm_cmds import register_llm_commands
 from honeyhex.cli.outbox_cli import register_outbox_commands
+from honeyhex.cli.plugins import register_plugin_commands
 from honeyhex.cli.porcelain import register_porcelain_commands
 from honeyhex.cli.swarm import register_swarm_commands
 from honeyhex.commit.manager import CommitManager
@@ -37,8 +39,10 @@ app.add_typer(daemon_app, name="daemon")
 
 register_swarm_commands(app)
 register_porcelain_commands(app)
+register_adoption_commands(app)
 register_outbox_commands(app)
 register_llm_commands(app)
+register_plugin_commands(app)
 
 
 @app.callback()
@@ -60,6 +64,12 @@ def commit_cmd(
         typer.Option("--rag-context", help="RAG context."),
     ] = "",
     scratchpad: Annotated[str, typer.Option("--scratchpad", help="Scratchpad.")] = "",
+    session_id: Annotated[
+        str,
+        typer.Option("--session-id", help="Optional session id."),
+    ] = "",
+    task: Annotated[str, typer.Option("--task", help="Optional task label.")] = "",
+    model: Annotated[str, typer.Option("--model", help="Optional model name.")] = "",
     tools_json: Annotated[
         str | None,
         typer.Option("--tools-json", help="Tool outputs as a JSON array."),
@@ -95,6 +105,9 @@ def commit_cmd(
             rag_context=rag_context,
             scratchpad=scratchpad,
             tool_outputs=tool_outputs,
+            session_id=session_id,
+            task=task,
+            model=model,
         )
 
     manager = CommitManager(root)

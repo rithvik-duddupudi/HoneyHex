@@ -15,6 +15,9 @@ class StateDiff(BaseModel):
     rag_context: str = ""
     scratchpad: str = ""
     tool_outputs: list[dict[str, Any]] = Field(default_factory=list)
+    session_id: str = ""
+    task: str = ""
+    model: str = ""
 
 
 class ThoughtCommit(BaseModel):

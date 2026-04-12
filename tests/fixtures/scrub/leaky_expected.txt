@@ -1,0 +1,4 @@
+Contact: user@example.com
+OpenAI [REDACTED_SK_KEY]
+Auth: Bearer [REDACTED]
+OK line

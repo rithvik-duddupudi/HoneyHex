@@ -2,6 +2,17 @@
 
 Core **`pip install honeyhex`** includes the ledger, porcelain, branching, bundles, and local outbox enqueue/list. Everything below is **optional** and shipped as **extras**.
 
+## When to use what
+
+| Situation | Default choice | Optional stack |
+|-----------|----------------|----------------|
+| Solo / small team; ledger stays on one machine | Git under **`.honeyhex`**, optional **private `git remote`** ([backup](backup-and-sync.md)) | — |
+| Multiple agents or hosts need lightweight HEAD sync | Local Git + **Hive-Daemon** + **Redis** (`[redis]`) | Set **`HONEYHEX_REDIS_URL`** |
+| Central review, PRs, votes, merge quorum | **`honeyhex-api`** registry (`[registry]`) | **`HONEYHEX_REGISTRY_URL`**, Postgres for production |
+| Automated LLM-assisted evaluation of proposals | **`[llm]`** + registry HTTP API (or ad hoc scripts) | Provider API keys |
+
+For a fuller comparison of HTTP registry vs Redis mesh, see [Security](security.md) and [HTTP API](http-api.md).
+
 ## Extra matrix
 
 | Extra | Install | Brings in |

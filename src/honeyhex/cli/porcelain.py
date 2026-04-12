@@ -8,6 +8,7 @@ from typing import Annotated
 import typer
 from git.exc import GitCommandError
 
+from honeyhex.adoption.timeutil import parse_iso_datetime
 from honeyhex.branching.git_ops import create_lightweight_tag, merge_branch
 from honeyhex.bundle.io import create_bundle, replay_bundle
 from honeyhex.cell.hooks import HookContext, echo_hook_output, run_named_hook
@@ -43,6 +44,31 @@ def register_porcelain_commands(app: typer.Typer) -> None:
             int | None,
             typer.Option("--max-count", "-n", help="Limit number of commits."),
         ] = None,
+        since: Annotated[
+            str | None,
+            typer.Option(
+                "--since",
+                help="Include commits at/after UTC date or ISO time.",
+            ),
+        ] = None,
+        until: Annotated[
+            str | None,
+            typer.Option(
+                "--until",
+                help="Include commits at/before UTC date or ISO time.",
+            ),
+        ] = None,
+        grep: Annotated[
+            str | None,
+            typer.Option("--grep", help="Substring filter on commit message."),
+        ] = None,
+        after_tag: Annotated[
+            str | None,
+            typer.Option(
+                "--after-tag",
+                help="Commits in git range tag..HEAD (see git rev-list).",
+            ),
+        ] = None,
         oneline: Annotated[
             bool,
             typer.Option("--oneline", help="One line per commit."),
@@ -62,6 +88,18 @@ def register_porcelain_commands(app: typer.Typer) -> None:
     ) -> None:
         """List thought-commits in `.honeyhex` (newest first)."""
         root = (cell or Path.cwd()).resolve()
+        since_dt = parse_iso_datetime(since)
+        until_dt = parse_iso_datetime(until)
+        has_filters = any(
+            x is not None for x in (since_dt, until_dt, grep, after_tag)
+        )
+        if graph and has_filters:
+            typer.echo(
+                "hex log: --graph cannot be combined with "
+                "--since/--until/--grep/--after-tag",
+                err=True,
+            )
+            raise typer.Exit(code=2)
         if graph:
             ensure_repo(root)
             text = git_log_graph(root, n)
@@ -69,9 +107,25 @@ def register_porcelain_commands(app: typer.Typer) -> None:
             return
         ensure_repo(root)
         if as_json:
-            typer.echo(log_as_json(root, max_count=n))
+            typer.echo(
+                log_as_json(
+                    root,
+                    max_count=n,
+                    since=since_dt,
+                    until=until_dt,
+                    message_grep=grep,
+                    after_tag=after_tag,
+                ),
+            )
             return
-        entries = iter_log(root, max_count=n)
+        entries = iter_log(
+            root,
+            max_count=n,
+            since=since_dt,
+            until=until_dt,
+            message_grep=grep,
+            after_tag=after_tag,
+        )
         typer.echo(format_log_text(entries, oneline=oneline), nl=bool(entries))
 
     @app.command("show")
@@ -235,6 +289,13 @@ def register_porcelain_commands(app: typer.Typer) -> None:
             bool,
             typer.Option("--hook-stubs", help="Install sample hook scripts."),
         ] = False,
+        guided: Annotated[
+            bool,
+            typer.Option(
+                "--guided",
+                help="Record a starter thought-commit and print next-step hints.",
+            ),
+        ] = False,
         cell: Annotated[
             Path | None,
             typer.Option("--cell", help="Agent cell root (default: cwd)."),
@@ -245,7 +306,7 @@ def register_porcelain_commands(app: typer.Typer) -> None:
             typer.echo("only `hex cell init` is supported", err=True)
             raise typer.Exit(code=2)
         root = (cell or Path.cwd()).resolve()
-        created = init_cell(root, hook_stubs=hook_stubs)
+        created = init_cell(root, hook_stubs=hook_stubs, guided=guided)
         typer.echo(json.dumps(created, indent=2))
 
     @app.command("merge")

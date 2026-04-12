@@ -1,0 +1,2 @@
+# Keep PyPI sdist/wheel lean: sample cells live in git only (see documentation).
+prune examples

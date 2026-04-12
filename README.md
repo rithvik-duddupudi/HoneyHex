@@ -4,6 +4,8 @@ Distributed ledger of intelligence for multi-agent systems: thought cycles are s
 
 **Documentation:** see **[`documentation/`](documentation/README.md)** — setup, full CLI reference, optional Redis/registry/LLM stacks, HTTP API, security, and development.
 
+**Example cells:** sample layouts live under **`examples/cells/`** in the Git repo (not shipped on PyPI—clone the repository to browse them).
+
 ## Quickstart
 
 **Requirements:** Python 3.12+, `git` on your `PATH`.
