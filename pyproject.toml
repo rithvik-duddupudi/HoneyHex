@@ -67,7 +67,7 @@ select = ["E", "F", "I", "UP", "B"]
 python_version = "3.12"
 strict = true
 mypy_path = "src"
-packages = ["honeyhex"]
+packages = ["honeyhex", "honeytrail"]
 
 [[tool.mypy.overrides]]
 module = [
@@ -89,8 +89,14 @@ module = [
     "litellm.*",
     "polars",
     "polars.*",
+    "mcp",
+    "mcp.*",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "honeytrail.server"
+disable_error_code = ["untyped-decorator", "no-untyped-call"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

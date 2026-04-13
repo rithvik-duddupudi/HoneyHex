@@ -115,7 +115,10 @@ class TrailStore:
         ).fetchone()
         if row is None:
             raise KeyError(f"session not found: {session_id}")
-        return row["head_node_id"]  # type: ignore[return-value]
+        head = row["head_node_id"]
+        if head is None:
+            return None
+        return str(head)
 
     def get_parent(self, node_id: str) -> str | None:
         row = self._conn.execute(
@@ -123,7 +126,10 @@ class TrailStore:
         ).fetchone()
         if row is None:
             raise KeyError(f"node not found: {node_id}")
-        return row["parent_id"]  # type: ignore[return-value]
+        parent = row["parent_id"]
+        if parent is None:
+            return None
+        return str(parent)
 
     def get_node(self, node_id: str) -> TrailNode:
         row = self._conn.execute(
