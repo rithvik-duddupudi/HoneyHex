@@ -49,6 +49,9 @@ honeyhex-api = "honeyhex.api.main:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+honeytrail = ["db/schema.sql"]
+
 [tool.ruff]
 target-version = "py312"
 src = ["src", "tests"]
