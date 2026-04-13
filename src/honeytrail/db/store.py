@@ -73,6 +73,42 @@ class TrailStore:
         self._conn.commit()
         return node_id
 
+    def append_tool(
+        self,
+        session_id: str,
+        tool_name: str,
+        tool_input_json: str = "{}",
+        tool_output_summary: str = "",
+        summary: str = "",
+    ) -> str:
+        current_head = self.get_head(session_id)
+        node_id = uuid.uuid4().hex
+        self._conn.execute(
+            """
+            INSERT INTO nodes
+              (id, session_id, parent_id, kind, summary,
+               monologue, state_json, tool_name, tool_input_json,
+               tool_output_summary, created_at)
+            VALUES (?, ?, ?, 'tool', ?, '', '{}', ?, ?, ?, ?)
+            """,
+            (
+                node_id,
+                session_id,
+                current_head,
+                summary,
+                tool_name,
+                tool_input_json,
+                tool_output_summary,
+                utc_now_iso(),
+            ),
+        )
+        self._conn.execute(
+            "UPDATE sessions SET head_node_id = ? WHERE id = ?",
+            (node_id, session_id),
+        )
+        self._conn.commit()
+        return node_id
+
     def get_head(self, session_id: str) -> str | None:
         row = self._conn.execute(
             "SELECT head_node_id FROM sessions WHERE id = ?", (session_id,)

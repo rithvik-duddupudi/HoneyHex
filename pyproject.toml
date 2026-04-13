@@ -29,6 +29,9 @@ llm = [
     "litellm>=1.55.0",
     "polars>=1.18.0",
 ]
+honeytrail = [
+    "mcp>=1.2.0",
+]
 dev = [
     "pytest>=8.0.0",
     "ruff>=0.8.0",
@@ -45,6 +48,7 @@ dev = [
 [project.scripts]
 hex = "honeyhex.cli.main:app"
 honeyhex-api = "honeyhex.api.main:main"
+honeytrail-mcp = "honeytrail.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

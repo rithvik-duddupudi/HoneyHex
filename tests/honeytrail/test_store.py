@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import uuid
 from pathlib import Path
-
-import pytest
 
 from honeytrail.db.store import TrailStore
 
@@ -56,7 +53,7 @@ def test_fork_and_merge(tmp_path: Path) -> None:
     sid = st.session_open("m")
     st.append_thought(sid, "root", "r0")
     tip_main = st.append_thought(sid, "mainline", "m1")
-    alt_tip = st.fork(sid, branch_name="alt", from_node_id=tip_main)
+    st.fork(sid, branch_name="alt", from_node_id=tip_main)
     st.checkout_branch(sid, "alt")
     st.append_thought(sid, "alternate idea", "a1")
     st.merge_into_current(sid, other_branch="main", summary="resolved: take alt")
