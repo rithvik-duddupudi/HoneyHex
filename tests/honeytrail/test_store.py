@@ -47,3 +47,20 @@ def test_branch_path(tmp_path: Path) -> None:
     path = s.linear_path_to_head(sid)
     assert [n.id for n in path] == [a, b]
     s.close()
+
+
+def test_fork_and_merge(tmp_path: Path) -> None:
+    from honeytrail.db.store import TrailStore
+
+    st = TrailStore(tmp_path / "t.db")
+    sid = st.session_open("m")
+    st.append_thought(sid, "root", "r0")
+    tip_main = st.append_thought(sid, "mainline", "m1")
+    alt_tip = st.fork(sid, branch_name="alt", from_node_id=tip_main)
+    st.checkout_branch(sid, "alt")
+    st.append_thought(sid, "alternate idea", "a1")
+    st.merge_into_current(sid, other_branch="main", summary="resolved: take alt")
+    head = st.get_head(sid)
+    node = st.get_node(head)
+    assert node.kind == "merge"
+    st.close()
