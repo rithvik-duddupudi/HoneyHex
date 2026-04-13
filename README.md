@@ -2,7 +2,7 @@
 
 Distributed ledger of intelligence for multi-agent systems: thought cycles are stored as Git commits under `.honeyhex/` in each **cell** (project directory).
 
-**Documentation:** see **[`documentation/`](documentation/README.md)** — setup, full CLI reference, optional Redis/registry/LLM stacks, HTTP API, security, and development.
+**Documentation:** see **[`documentation/`](documentation/README.md)** — setup, full CLI reference, optional Redis/registry/LLM stacks, HTTP API, security, [legal disclaimer](documentation/legal-disclaimer.md), and development.
 
 **Example cells:** sample layouts live under **`examples/cells/`** in the Git repo (not shipped on PyPI—clone the repository to browse them).
 
@@ -12,6 +12,9 @@ Distributed ledger of intelligence for multi-agent systems: thought cycles are s
 
 ```bash
 pip install honeyhex
+# or, with a Homebrew tap that packages the formula (see packaging/homebrew/):
+# brew tap <user>/honeyhex && brew install honeyhex
+
 cd your-agent-cell
 hex cell init
 hex commit -m "why I acted" --prompt "..." --scratchpad "..."
