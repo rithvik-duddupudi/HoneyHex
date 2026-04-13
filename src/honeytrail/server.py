@@ -14,7 +14,8 @@ app = Server("honey-trail")
 
 
 def _db() -> TrailStore:
-    raw = os.environ.get("HONEYTRAIL_DB_PATH", str(Path.home() / ".honeytrail" / "default.db"))
+    default_db = str(Path.home() / ".honeytrail" / "default.db")
+    raw = os.environ.get("HONEYTRAIL_DB_PATH", default_db)
     return TrailStore(Path(raw))
 
 
@@ -24,7 +25,11 @@ async def list_tools() -> list[Tool]:
         Tool(
             name="trail_session_open",
             description="Open or create a reasoning session.",
-            inputSchema={"type": "object", "properties": {"label": {"type": "string"}}, "required": []},
+            inputSchema={
+                "type": "object",
+                "properties": {"label": {"type": "string"}},
+                "required": [],
+            },
         ),
         Tool(
             name="trail_append_thought",
@@ -41,7 +46,9 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="trail_append_tool",
-            description="Append a tool-call node with name, input JSON, and output summary.",
+            description=(
+                "Append a tool-call node with name, input JSON, and output summary."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -55,7 +62,10 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="trail_get_branch",
-            description="Return the linear path from root to head with summaries (get-last-logic-branch).",
+            description=(
+                "Return the linear path from root to head with summaries "
+                "(get-last-logic-branch)."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -67,7 +77,10 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="trail_rollback",
-            description="Move the session head to the parent of the node matching before_substring.",
+            description=(
+                "Move the session head to the parent of the node matching "
+                "before_substring."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -79,7 +92,9 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="trail_fork",
-            description="Create a fork node from from_node_id and register a named branch.",
+            description=(
+                "Create a fork node from from_node_id and register a named branch."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -92,7 +107,9 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="trail_merge",
-            description="Create a merge node: current head (A) + named other_branch tip (B).",
+            description=(
+                "Create a merge node: current head (A) + named other_branch tip (B)."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -137,14 +154,20 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:  # type: i
             if branch:
                 store.checkout_branch(sid, branch)
             path = store.linear_path_to_head(sid)
-            lines = [f"{n.id}\t{n.kind}\t{n.summary}\t{n.monologue[:200]}" for n in path]
+            lines = [
+                f"{n.id}\t{n.kind}\t{n.summary}\t{n.monologue[:200]}"
+                for n in path
+            ]
             return [TextContent(type="text", text="\n".join(lines))]
 
         if name == "trail_rollback":
             result = store.rollback_to_parent_of_match(
                 arguments["session_id"], arguments["before_substring"]
             )
-            return [TextContent(type="text", text=f"rolled back: {result.previous_head_id} → {result.new_head_id}")]
+            msg = (
+                f"rolled back: {result.previous_head_id} → {result.new_head_id}"
+            )
+            return [TextContent(type="text", text=msg)]
 
         if name == "trail_fork":
             fork_id = store.fork(
