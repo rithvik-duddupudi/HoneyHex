@@ -29,10 +29,14 @@ llm = [
     "litellm>=1.55.0",
     "polars>=1.18.0",
 ]
+honeytrail = [
+    "mcp>=1.2.0",
+]
 dev = [
     "pytest>=8.0.0",
     "ruff>=0.8.0",
     "mypy>=1.13.0",
+    "mcp>=1.2.0",
     "redis>=5.0.0",
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.32.0",
@@ -45,9 +49,13 @@ dev = [
 [project.scripts]
 hex = "honeyhex.cli.main:app"
 honeyhex-api = "honeyhex.api.main:main"
+honeytrail-mcp = "honeytrail.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+honeytrail = ["db/schema.sql"]
 
 [tool.ruff]
 target-version = "py312"
@@ -60,7 +68,7 @@ select = ["E", "F", "I", "UP", "B"]
 python_version = "3.12"
 strict = true
 mypy_path = "src"
-packages = ["honeyhex"]
+packages = ["honeyhex", "honeytrail"]
 
 [[tool.mypy.overrides]]
 module = [
@@ -82,8 +90,14 @@ module = [
     "litellm.*",
     "polars",
     "polars.*",
+    "mcp",
+    "mcp.*",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "honeytrail.server"
+disable_error_code = ["untyped-decorator", "no-untyped-call"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

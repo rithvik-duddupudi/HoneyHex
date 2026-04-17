@@ -17,5 +17,6 @@ HoneyHex is a **distributed ledger of intelligence** for agent workflows: though
 | [Plugins](plugins.md) | `honeyhex.plugins` entry points for third-party `hex` commands |
 | [Backup & sync](backup-and-sync.md) | Remotes, bundles, git-crypt notes |
 | [Merge & fork](merge-and-fork.md) | Combining or splitting ledgers |
+| [Honey-Trail MCP](honey-trail.md) | Reasoning debugger: record thoughts, rollback, fork/merge agent logic |
 
 **Requirements:** Python 3.12+, `git` on `PATH`. The CLI entry point is **`hex`**.
